@@ -1,6 +1,11 @@
-FROM openjdk:11-jdk
-COPY target/spring-petclinic-2.7.0-SNAPSHOT.jar /
+# Use a minimal JDK base image
+FROM eclipse-temurin:11-jre-alpine
+#copy jar
+COPY target/*.jar /app.jar
+#expose port
 EXPOSE 8080
-CMD ["java","-jar","spring-petclinic-2.7.0-SNAPSHOT.jar"]
+#Run App
+ENTRYPOINT ["java"]
+CMD ["-jar","/app.jar"]
 #####
 
