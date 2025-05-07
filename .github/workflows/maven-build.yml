@@ -4,4 +4,17 @@ on:
 #  push:
 #    branches:
 #    - master
-  workflow_dispatch:  
+  workflow_dispatch:
+
+jobs:
+  Build:
+    name: "build the jar"
+    runs-on: self-hosted
+    steps:
+      - name: check out code
+        uses: actions/checkout@v4
+      
+      - name: build with maven
+        run: mvn clean install -f pom.xml
+
+
