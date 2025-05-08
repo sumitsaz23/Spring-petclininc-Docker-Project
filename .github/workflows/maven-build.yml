@@ -19,29 +19,29 @@ jobs:
       - name: build with maven
         run: mvn clean install -f pom.xml
 
-     # - name: Build and analyze
-      #  env:
-       #   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        #  SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
-       # run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=spring-petclinic-docker-project -Dsonar.projectName='spring-petclinic-docker-project'
-  
-  Securitycheck:
-    name: Sonarqube check
-    runs-on: self-hosted
-    needs: Build
-    steps:   
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5.2.0 # Ex: v4.1.0, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
+      - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=spring-petclinic-docker-project -Dsonar.projectName='spring-petclinic-docker-project'
+  
+#  Securitycheck:
+ #   name: Sonarqube check
+  #  runs-on: self-hosted
+   # needs: Build
+    #steps:   
+     # - name: SonarQube Scan
+      #  uses: SonarSource/sonarqube-scan-action@v5.2.0 # Ex: v4.1.0, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
+       # env:
+        #  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+         # SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
 
       # Check the Quality Gate status.
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        with:
-          pollingTimeoutSec: 600
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+      #- name: SonarQube Quality Gate check
+       # id: sonarqube-quality-gate-check
+        #uses: sonarsource/sonarqube-quality-gate-action@master
+       # with:
+        #  pollingTimeoutSec: 600
+       # env:
+        #  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+         # SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
