@@ -73,8 +73,14 @@ jobs:
       with:
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Trivy scan
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        image-ref: "${{env.app_name}}:${{ github.sha }}"
+        format: 'table'
         
     - name: Push to Docker Hub
       run: |
-        docker tag "${{env.app_name}}:${{ github.sha }}" "${{vars.DOCKERHUB_USERNAME}}/${{env.app_name}}":v1.1
-        docker push "${{vars.DOCKERHUB_USERNAME}}/${{env.app_name}}":v1.1
+        docker tag "${{env.app_name}}:${{ github.sha }}" "${{vars.DOCKERHUB_USERNAME}}/${{env.app_name}}":${{github.ref_name}}
+        docker push "${{vars.DOCKERHUB_USERNAME}}/${{env.app_name}}":${{github.ref_name}}
