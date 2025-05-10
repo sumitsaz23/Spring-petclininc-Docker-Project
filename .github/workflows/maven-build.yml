@@ -120,7 +120,7 @@ jobs:
 
     - name: SSH & start docker container
       run: |
-        ssh -i "key.pem" -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ env.REMOTE_SERVER }} bash << 'EOF'
+        ssh -nT -i "key.pem" -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ env.REMOTE_SERVER }} bash << 'EOF'
           set -e
           docker pull "${{ env.IMAGE }}"
           echo "Stopping existing container: ${{ env.CONTAINER }}"
@@ -133,4 +133,5 @@ jobs:
           echo "Tailing logs to springpetapp.log"
           pkill -f "docker logs -f ${{ env.CONTAINER }}" || true
           nohup bash -c "docker logs -f ${{ env.CONTAINER }} >> ${{ env.PATH }}/springpetapp.log 2>&1" </dev/null &
+          exit
         EOF
