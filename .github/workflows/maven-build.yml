@@ -100,22 +100,38 @@ jobs:
       SHH_KEY: ${{secrets.REMOTE_SSH_KEY}}
 
     steps:
-    - name: "SSH key & login"
+    - name: "SSH key"
       run: |
-        echo $GITHUB_PATH
         echo "/usr/bin" >> $GITHUB_PATH
         echo "${{ secrets.REMOTE_SSH_KEY }}" > key.pem
         /usr/bin/chmod 400 key.pem
-        ssh -i "key.pem" ${{env.REMOTE_USER}}@${{env.REMOTE_SERVER}}
 
-    - name: "start docker container"
+    # - name: "SSH & start docker container"
+    #   run: |
+    #     /usr/bin/ssh -i "key.pem" ${{env.REMOTE_USER}}@${{env.REMOTE_SERVER}}
+    #     docker pull ${{env.IMAGE}}
+    #     echo "Stopping existing container: ${{env.CONTAINER}}"
+    #     docker stop "${{env.CONTAINER}}" || true && docker rm "${{env.CONTAINER}}" || true
+    #     docker run -d --name=${{env.CONTAINER}} ${{env.IMAGE}} -p 9000:9000
+
+    #     echo "Removing existing container: ${{env.CONTAINER}}"
+    #     pkill -f "docker logs -f ${{env.CONTAINER}}" || true
+    #     nohup bash -c "docker logs -f ${{env.CONTAINER}} >> ${{env.PATH}}/springpetapp.log  2>&1" </dev/null &
+
+
+    - name: SSH & start docker container
       run: |
-        docker pull ${{env.IMAGE}}
-        echo "Stopping existing container: ${{env.CONTAINER}}"
-        docker stop "${{env.CONTAINER}}" || true && docker rm "${{env.CONTAINER}}" || true
-        docker run -d --name=${{env.CONTAINER}} ${{env.IMAGE}} -p 9000:9000
-
-        echo "Removing existing container: ${{env.CONTAINER}}"
-        pkill -f "docker logs -f ${{env.CONTAINER}}" || true
-        nohup bash -c "docker logs -f ${{env.CONTAINER}} >> ${{env.PATH}}/springpetapp.log  2>&1" </dev/null &
-
+        ssh -i "key.pem" ${{ env.REMOTE_USER }}@${{ env.REMOTE_SERVER }} bash << 'EOF'
+          set -e
+          docker pull "${{ env.IMAGE }}"
+          echo "Stopping existing container: ${{ env.CONTAINER }}"
+          docker stop "${{ env.CONTAINER}}" || true
+          docker rm "${{ env.CONTAINER}}"   || true
+          docker run -d \
+            --name="${{ env.CONTAINER }}" \
+            -p 9000:9000 \
+            "${{ env.IMAGE }}"
+          echo "Tailing logs to springpetapp.log"
+          pkill -f "docker logs -f ${{ env.CONTAINER }}" || true
+          nohup bash -c "docker logs -f ${{ env.CONTAINER }} >> ${{ env.PATH }}/springpetapp.log 2>&1" </dev/null &
+        EOF
