@@ -128,6 +128,7 @@ jobs:
           docker rm "${{ env.CONTAINER}}"   || true
           docker run -d \
             --name="${{ env.CONTAINER }}" \
+            -p 8080:8080 \
             "${{ env.IMAGE }}"
           echo "Tailing logs to springpetapp.log"
           pkill -f "docker logs -f ${{ env.CONTAINER }}" || true
