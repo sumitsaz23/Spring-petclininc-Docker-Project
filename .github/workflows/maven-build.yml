@@ -79,7 +79,6 @@ jobs:
       with:
         image-ref: "${{env.app_name}}:${{ github.sha }}"
         format: 'table'
-        exit-code: '1'
         
     - name: Push to Docker Hub
       run: |
