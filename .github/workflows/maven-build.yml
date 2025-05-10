@@ -25,7 +25,7 @@ jobs:
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
         run: | 
           mvn clean install -f pom.xml
-          mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=spring-petclinic-docker-project -Dsonar.projectName='spring-petclinic-docker-project'
+  #        mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=spring-petclinic-docker-project -Dsonar.projectName='spring-petclinic-docker-project'
     
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4.6.2
@@ -34,30 +34,30 @@ jobs:
           path: target/*.jar 
 
 
-  # Securitycheck:
-  #   name: Sonarqube check
-  #   runs-on: self-hosted
-  #   needs: Build
-  #   steps:   
-  #     - name: SonarQube Scan
-  #       uses: SonarSource/sonarqube-scan-action@v5.2.0 # Ex: v4.1.0, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+  Securitycheck:
+    name: Sonarqube check
+    runs-on: self-hosted
+    needs: Build
+    steps:   
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5.2.0 # Ex: v4.1.0, See the latest version at https://github.com/marketplace/actions/official-sonarqube-scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
 
-  # Check_Quality_Gate_status:
-  #   name: quality gate
-  #   runs-on: self-hosted
-  #   needs: Securitycheck
-  #   steps:
-  #     - name: SonarQube Quality Gate check
-  #       id: sonarqube-quality-gate-check
-  #       uses: sonarsource/sonarqube-quality-gate-action@master
-  #       with:
-  #         pollingTimeoutSec: 600
-  #       env:
-  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-  #         SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+  Check_Quality_Gate_status:
+    name: quality gate
+    runs-on: self-hosted
+    needs: Securitycheck
+    steps:
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
+        with:
+          pollingTimeoutSec: 600
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
   
   Docker_Build:
     name: Build Docker image
@@ -94,7 +94,7 @@ jobs:
     env:
       REMOTE_SERVER: "3.108.238.222"
       REMOTE_USER: ubuntu
-      IMAGE: "sumitsur74/springpetclinic:tagname:${{github.ref_name}}"
+      IMAGE: "sumitsur74/springpetclinic:${{github.ref_name}}"
       CONTAINER: "springpet-app"
       PATH: /home/ubuntu
 
