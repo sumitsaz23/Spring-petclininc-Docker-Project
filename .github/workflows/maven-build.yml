@@ -103,7 +103,7 @@ jobs:
     - name: "SSH key"
       run: |
         echo "${{ secrets.REMOTE_SSH_KEY }}" > key.pem
-        sudo chmod 400 key.pem
+        sudo /usr/bin/chmod 400 key.pem
 
     - name: "start docker container"
       run: |
