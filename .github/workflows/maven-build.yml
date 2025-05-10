@@ -97,7 +97,6 @@ jobs:
       IMAGE: "sumitsur74/springpetclinic:tagname:${{github.ref_name}}"
       CONTAINER: "springpet-app"
       PATH: /home/ubuntu
-      SHH_KEY: ${{secrets.REMOTE_SSH_KEY}}
 
     steps:
     - name: "SSH key"
