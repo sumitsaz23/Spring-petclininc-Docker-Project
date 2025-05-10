@@ -120,7 +120,7 @@ jobs:
 
     - name: SSH & start docker container
       run: |
-        ssh -i "key.pem" ${{ env.REMOTE_USER }}@${{ env.REMOTE_SERVER }} bash << 'EOF'
+        ssh -i "key.pem" -o StrictHostKeyChecking=no ${{ env.REMOTE_USER }}@${{ env.REMOTE_SERVER }} bash << 'EOF'
           set -e
           docker pull "${{ env.IMAGE }}"
           echo "Stopping existing container: ${{ env.CONTAINER }}"
