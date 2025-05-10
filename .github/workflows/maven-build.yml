@@ -79,8 +79,40 @@ jobs:
       with:
         image-ref: "${{env.app_name}}:${{ github.sha }}"
         format: 'table'
+        exit-code: '1'
         
     - name: Push to Docker Hub
       run: |
         docker tag "${{env.app_name}}:${{ github.sha }}" "${{vars.DOCKERHUB_USERNAME}}/${{env.app_name}}":${{github.ref_name}}
         docker push "${{vars.DOCKERHUB_USERNAME}}/${{env.app_name}}":${{github.ref_name}}
+
+  Deploy:
+    name: Deploy app docker image
+    runs-on: self-hosted
+    needs: Docker_Build
+    env:
+      REMOTE_SERVER: "3.108.238.222"
+      REMOTE_USER: ubuntu
+      IMAGE: "sumitsur74/springpetclinic:tagname:${{github.ref_name}}"
+      CONTAINER: "springpet-app"
+      PATH: /home/ubuntu
+      SHH_KEY: ${{secrets.REMOTE_SSH_KEY}}
+
+    steps:
+    - name: "SSH key"
+      run: |
+        echo "${{ secrets.REMOTE_SSH_KEY }}" > key.pem
+        chmod 400 key.pem
+
+    - name: "start docker container"
+      run: |
+        ssh -i "key.pem" ${{env.REMOTE_USER}}@${{env.REMOTE_SERVER}}
+        docker pull ${{env.IMAGE}}
+        echo "Stopping existing container: ${{env.CONTAINER}}"
+        docker stop "${{env.CONTAINER}}" || true && docker rm "${{env.CONTAINER}}" || true
+        docker run -d --name=${{env.CONTAINER}} ${{env.IMAGE}} -p 9000:9000
+
+        echo "Removing existing container: ${{env.CONTAINER}}"
+        pkill -f "docker logs -f ${{env.CONTAINER}}" || true
+        nohup bash -c "docker logs -f ${{env.CONTAINER}} >> ${{env.PATH}}/springpetapp.log  2>&1" </dev/null &
+
